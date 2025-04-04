@@ -126,7 +126,7 @@ const MapboxExample: React.FC = () => {
 
   return (
     <>
-      <div className="sidebar">Zoom: {zoom.toFixed(2)}</div>
+      <div className="sidebar">Zoom: {zoom.toFixed(2)} KM: {kmm}</div>
       <div
         id="map-container"
         ref={mapContainerRef}
