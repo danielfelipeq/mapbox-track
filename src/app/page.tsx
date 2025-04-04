@@ -10,7 +10,7 @@ export default function Home() {
         </section>
       </main>
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <p>Footer</p>
+        <p>Footer...</p>
       </footer>
     </div>
   );
