@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@turf/helpers": "^7.2.0",
     "@turf/turf": "^7.2.0",
     "@vis.gl/react-google-maps": "^1.5.2",
     "mapbox-gl": "^3.11.0",

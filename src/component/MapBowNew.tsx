@@ -1,3 +1,4 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useRef, useEffect, useState } from "react";
@@ -40,52 +41,61 @@ const MapboxExample: React.FC = () => {
   };
   const renderMarkers = (currentZoom: number) => {
     if (!mapRef.current) return;
-
+  
     markersRef.current.forEach((marker) => marker.remove());
     markersRef.current = [];
-
+  
     const filteredStores = STORES.filter((store) => {
-      if (currentZoom < 10) return store.Priorizacion === 1;
-      if (currentZoom >= 10 && currentZoom <= 12)
+      if (currentZoom < 12) return store.Priorizacion === 1;
+      if (currentZoom >= 12 && currentZoom <= 13)
         return store.Priorizacion === 1 || store.Priorizacion === 2;
       return true;
     });
-
+  
+    // Solo aplicar restricción de distancia entre 10 y 13 de zoom
+    const useDistanceFilter = currentZoom >= 10 && currentZoom <= 11.5;
+    const addedPoints: any[] = [];
+  
     filteredStores.forEach((store) => {
       const longitude = parseFloat(store.longitude as string);
       const latitude = parseFloat(store.latitude as string);
-    
+  
       if (isNaN(longitude) || isNaN(latitude)) return;
-    
-      // 📌 Crear un contenedor div para el popup
+  
+      const newPoint = turf.point([longitude, latitude]);
+  
+      // ✅ Aplicar restricción solo si está en el rango de zoom entre 10 y 13
+      if (useDistanceFilter) {
+        const MIN_DISTANCE = 1.5; // 🔹 100 metros en km
+        if (addedPoints.some((p) => turf.distance(p, newPoint, { units: "kilometers" }) < MIN_DISTANCE)) {
+          return; // ❌ No agregamos puntos demasiado cercanos
+        }
+      }
+  
+      addedPoints.push(newPoint); // ✅ Guardamos el punto solo si pasó la validación
+  
       const popupContainer = document.createElement("div");
-      popupContainer.className =
-        "bg-gray-100 p-2 max-w-[200px]";
-    
-      // 📌 Agregar contenido
+      popupContainer.className = "bg-gray-100 p-2 max-w-[200px]";
       popupContainer.innerHTML = `
         <h3 class="text-base font-semibold text-gray-900">${store.Nombre_comercial}</h3>
         <p class="text-sm text-gray-700">${store.Direccion_Store || "Dirección no disponible"}</p>
       `;
-    
+  
       const popup = new mapboxgl.Popup().setDOMContent(popupContainer);
-    
+      
+      const defaultColor = store.Priorizacion === 1 ? "red" : store.Priorizacion === 2 ? "orange" : "gray";
       const marker = new mapboxgl.Marker({
         color:
-          store.Priorizacion === 1
-            ? "red"
-            : store.Priorizacion === 2
-            ? "orange"
-            : "gray",
+          defaultColor
       })
         .setLngLat([longitude, latitude])
-        .setPopup(popup) // ✅ Ahora el popup usa Tailwind
+        .setPopup(popup)
         .addTo(mapRef.current!);
-    
+  
       markersRef.current.push(marker);
     });
-    
   };
+  
 
   useEffect(() => {
     if (!mapContainerRef.current) return;
@@ -97,7 +107,7 @@ const MapboxExample: React.FC = () => {
       style: "mapbox://styles/mapbox/streets-v12",
       center: INITIAL_CENTER,
       zoom: INITIAL_ZOOM,
-      minZoom: 9,
+      minZoom: 10,
       maxZoom: 18,
       maxBounds: CHILE_BOUNDS,
     });
