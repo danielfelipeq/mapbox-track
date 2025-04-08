@@ -2,25 +2,38 @@
 import { useEffect, useState } from 'react';
 
 const GeoComponent = () => {
-    const [geoData, setGeoData] = useState<{ latitude: number; longitude: number } | null>(null);
+    const [geoData, setGeoData] = useState<{
+        city: string;
+        region: string;
+        country: string;
+        latitude: number | null;
+        longitude: number | null;
+    } | null>(null);
 
     useEffect(() => {
-        const geoLocation = document.cookie
+        // Obtén la cookie de geolocalización
+        const cookie = document.cookie
             .split('; ')
-            .find(row => row.startsWith('geoLocation='))
-            ?.split('=')[1];
-        if (geoLocation) {
-            setGeoData(JSON.parse(decodeURIComponent(geoLocation)));
+            .find(row => row.startsWith('geoLocation='));
+
+        if (cookie) {
+            const geoLocation = decodeURIComponent(cookie.split('=')[1]);
+            setGeoData(JSON.parse(geoLocation));
+        } else {
+            setGeoData(null);
         }
     }, []);
 
-    if (!geoData) return <p className='text-black'>Loading...</p>;
+    if (!geoData) return <p>Loading...</p>;
 
     return (
         <div>
-            <h1 className='text-black'>Your Location</h1>
-            <p className='text-black'>Latitude: {geoData.latitude}</p>
-            <p className='text-black'>Longitude: {geoData.longitude}</p>
+            <h1>Your Location</h1>
+            <p>City: {geoData.city}</p>
+            <p>Region: {geoData.region}</p>
+            <p>Country: {geoData.country}</p>
+            <p>Latitude: {geoData.latitude}</p>
+            <p>Longitude: {geoData.longitude}</p>
         </div>
     );
 };
