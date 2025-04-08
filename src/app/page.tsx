@@ -1,5 +1,5 @@
 import GeoComponent from "@/component/Map";
-import MapboxExample from "@/component/MapBowNew";
+// import MapboxExample from "@/component/MapBowNew";
 import "mapbox-gl/dist/mapbox-gl.css";
 
 export default function Home() {
